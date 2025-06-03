@@ -30,10 +30,19 @@ HTML_TEMPLATE = """
   <meta charset="UTF-8">
   <title>СВК Фарм - Аптеки</title>
   <style>
-    body {{ font-family: Arial, sans-serif; background-color: #f4f8fb; padding: 20px; }}
-    h1 {{ text-align: center; color: #0077cc; }}
+    body {{
+      font-family: Arial, sans-serif;
+      background-color: #fffbea;
+      padding: 20px;
+    }}
+    h1 {{
+      text-align: center;
+      color: #0057b7;
+      text-shadow: 1px 1px 2px #ffd700;
+    }}
     .pharmacy {{
       background: white;
+      border-left: 6px solid #0057b7;
       border-radius: 8px;
       padding: 15px;
       margin-bottom: 15px;
@@ -56,8 +65,11 @@ HTML_TEMPLATE = """
       margin-top: 30px;
       margin-bottom: 30px;
     }}
+    .drugs-list h2 {{
+      color: #0057b7;
+    }}
     .drugs-list a {{
-      color: #0077cc;
+      color: #0057b7;
       font-weight: bold;
       margin: 0 5px;
       font-size: 18px;
@@ -67,6 +79,7 @@ HTML_TEMPLATE = """
     }}
     .drugs-list a:hover {{
       text-decoration: underline;
+      color: #003d99;
     }}
     form {{
       max-width: 400px;
@@ -87,17 +100,21 @@ HTML_TEMPLATE = """
     }}
     form button {{
       padding: 10px 20px;
-      background-color: #0077cc;
+      background-color: #0057b7;
       color: white;
       border: none;
       border-radius: 4px;
       cursor: pointer;
       font-size: 16px;
     }}
+    form button:hover {{
+      background-color: #003d99;
+    }}
     .search-results {{
       max-width: 800px;
       margin: 10px auto 30px auto;
       background: white;
+      border-left: 6px solid #ffd700;
       border-radius: 8px;
       padding: 15px;
       box-shadow: 0 1px 4px rgba(0,0,0,0.1);
@@ -107,6 +124,9 @@ HTML_TEMPLATE = """
   </style>
 </head>
 <body>
+  <div style="text-align: center; margin-bottom: 10px;">
+    <img src="/static/logo.png" alt="Логотип" style="height: 80px;">
+  </div>
   <h1>Аптеки СВК Фарм</h1>
 
   <form method="GET" action="/">
@@ -155,7 +175,6 @@ def clean_drug_name_for_url(name: str) -> str:
 
 @app.route("/", methods=["GET"])
 def index():
-    # Завантаження аптек
     df_pharmacies = pd.read_excel("contacts.xlsx")
     records = df_pharmacies.to_dict(orient="records")
 
@@ -176,24 +195,20 @@ def index():
         </div>
         """
 
-    # Завантаження ліків
     df_drugs = pd.read_excel("drugs.xlsx")
     drugs_list = df_drugs["Назва ліків"].dropna().tolist()
 
-    # Випадкові ліки
     random_drugs = random.sample(drugs_list, min(10, len(drugs_list)))
     random_drugs_html = " ".join(
         f'<a href="https://tabletki.ua/uk/search/{clean_drug_name_for_url(drug).replace(" ", "%20")}/" target="_blank" rel="noopener noreferrer">{clean_drug_name_for_url(drug)}</a>'
         for drug in random_drugs
     )
 
-    # Пошук
     search_query = request.args.get("search", "").strip()
     search_results_html = ""
 
     if search_query:
         filtered_rows = df_drugs[df_drugs["Назва ліків"].str.lower().str.contains(search_query.lower(), na=False)]
-
         if not filtered_rows.empty:
             search_results_html = "<h2>Результати пошуку:</h2><ul style='list-style:none; padding:0;'>"
             for _, row in filtered_rows.head(20).iterrows():
