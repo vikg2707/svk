@@ -10,9 +10,7 @@ base_icons = [
     "pill",
     "first-aid-kit",
     "pharmacy-shop",
-    "hospital-room",
-    "syringe",
-    "stethoscope"
+    
 ]
 
 icon_colors = [
@@ -124,10 +122,8 @@ HTML_TEMPLATE = """
   </style>
 </head>
 <body>
-  <div style="text-align: center; margin-bottom: 10px;">
-    <img src="static/logo.png" alt="Логотип" style="height: 80px;">
-  </div>
-  <h1>Аптеки СВК Фарм</h1>
+  
+    <h1>Аптеки СВК Фарм</h1>
 
   <form method="GET" action="/">
     <input type="text" name="search" placeholder="Пошук ліків" value="{search_query}" required>
